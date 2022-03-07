@@ -21,9 +21,9 @@ def make_prediction_targets():
     df = get_target_data()
     pipeline = get_model_target()
     nearest_targets = pipeline.kneighbors(df,10)
-    
+
     targets = pd.read_csv('targets.csv')
-    
+
     name = []
     description = []
     distance = []
@@ -32,45 +32,45 @@ def make_prediction_targets():
         name.append(targets['target_name'].iloc[x])
         description.append(targets['strs'].iloc[x])
         distance.append(y)
-    
-    
+
+
     df_companies = pd.DataFrame({'name':name,
                 'description':description,
                 'distance':distance})
-    
+
     return df_companies
 
 def matching_investors(df_companies):
-    
-    matching_table = pd.read_csv('matching_table.csv')
-    
+
+    matching_table = pd.read_excel('matching_table_raw.xlsx')
+
     matching_investors = []
     matching_target = []
     matching_distance = []
-    
+
     for company in df_companies['name']:
-        next_investor = matching_table[(matching_table['target_name']==company) & (matching_table['deal_stage_id']==4)]['comp_name'].tolist()
+        next_investor = matching_table[(matching_table['target_name']==company) & (matching_table['deal_stage_id']>=3)]['comp_name'].tolist()
         matching_investors+=next_investor
         matching_target+=len(next_investor)*[company]
         next_distance = df_companies[df_companies['name']==company]['distance'].tolist()
         matching_distance+=len(next_investor)*next_distance
     df_match_investors = pd.DataFrame({'investors':matching_investors,'targets':matching_target,'distance':matching_distance})
-    
+
     return df_match_investors
 
 def best_investors(df_match_investors):
-    
+
     if len(df_match_investors['investors'].unique())>=10:
         best_investors = df_match_investors['investors'].unique()[:10].tolist()
     else:
-        best_investors = df_match_investors['investors'].unique().tolist()    
-     
+        best_investors = df_match_investors['investors'].unique().tolist()
+
     return best_investors
 
 def make_prediction_investors(df_match_investors, best_investors):
 
     investors_clean = pd.read_csv('investors.csv')
-    
+
     name_investor = []
     description_investor = []
     distance_investor_investor = []
@@ -99,7 +99,7 @@ def make_prediction_investors(df_match_investors, best_investors):
             name_investor.append(investors_clean['name'].iloc[x])
             description_investor.append(investors_clean['name_de'].iloc[x])
             distance_investor_investor.append(y)
-            distance_target_target.append(first_distance)    
+            distance_target_target.append(first_distance)
 
     df_investors = pd.DataFrame({'name':name_investor,
                 'description':description_investor,
