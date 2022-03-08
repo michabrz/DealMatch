@@ -6,7 +6,9 @@ MODEL_TARGETS = 'model_targets.joblib'
 MODEL_INVESTORS = 'model_investors.joblib'
 
 def get_target_data():
-    df_pred = pd.read_csv('target_data.csv')
+    df_pred = pd.read_excel('targets_clean_test.xlsx')
+    print(df_pred)
+    print(df_pred.columns)
     return df_pred
 
 def get_model_target():
@@ -20,7 +22,8 @@ def get_model_investors():
 def make_prediction_targets():
     df = get_target_data()
     pipeline = get_model_target()
-    nearest_targets = pipeline.kneighbors(df,10)
+    print(pipeline.named_steps['preproc'].transform([df]))
+    nearest_targets = pipeline['NN'].kneighbors(df,10)
 
     targets = pd.read_csv('targets.csv')
 
@@ -110,6 +113,8 @@ def make_prediction_investors(df_match_investors, best_investors):
     df_investors_sorted = df_investors.sort_values('distance_target<=>investor')
     df_investors_sorted.reset_index(inplace=True)
     df_investors_sorted.drop('index',axis=1,inplace=True)
+
+    df_investors_sorted.to_csv('investors_output.csv')
 
     return df_investors_sorted
 
