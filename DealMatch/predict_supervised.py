@@ -33,7 +33,6 @@ def get_pred_table():
     pred_df = pd.concat([df_target, df_investors_to_match_target], axis=1)
     return pred_df
 
-
 def custom_predict(X, custom_threshold):
     model = get_model_supervised()
     probs = model.predict_proba(
