@@ -9,6 +9,7 @@ numpy
 pandas
 scikit-learn
 nltk
+string
 
 # tests/linter
 black
@@ -27,3 +28,8 @@ s3fs
 six>=1.14
 joblib
 memoized-property
+os
+
+# database
+sqlalchemy
+dotenv
