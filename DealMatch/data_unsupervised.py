@@ -38,6 +38,8 @@ def remove_punctuations(text):
     return text
 
 def clean_targets(targets):
+    import nltk
+    nltk.download('stopwords')
 
     targets['deal_id'] = targets.groupby(['deal_name']).ngroup()
     targets['target_company_id'] = targets.groupby(['target_name']).ngroup()

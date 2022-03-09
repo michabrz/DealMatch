@@ -34,11 +34,11 @@ class Trainer():
         ], remainder='drop')
 
 
-        self.pipeline_targets = Pipeline([('preproc', preprocessor),
-                                          ('pca',
-                                           TruncatedSVD()),
-                                          ('NN',
-                                           NearestNeighbors(n_neighbors=10))])
+        self.pipeline_targets = Pipeline([('preproc', preprocessor)])
+                                          #('pca',
+                                          # TruncatedSVD()),
+                                         # ('NN',
+                                          # NearestNeighbors(n_neighbors=10))])
 
 
     def run_targets(self):
@@ -78,11 +78,11 @@ class Trainer():
 
 if __name__ == "__main__":
 
-    # df_targets = get_targets_data()
-    # df_investors = get_investors_data()
-    # df_investor_keys = get_matching_keys()
-    # df_targets_clean = clean_targets(df_targets)
-    # df_investors_clean = clean_investors(df_investors,df_investor_keys)
+    df_targets = get_targets_data()
+    df_investors = get_investors_data()
+    df_investor_keys = get_matching_keys()
+    df_targets_clean = clean_targets(df_targets)
+    df_investors_clean = clean_investors(df_investors,df_investor_keys)
     df_targets_clean = pd.read_csv('targets.csv', index_col=0)
     df_investors_clean = pd.read_csv('investors.csv', index_col=0)
     X = df_targets_clean

@@ -6,9 +6,7 @@ MODEL_TARGETS = 'model_targets.joblib'
 MODEL_INVESTORS = 'model_investors.joblib'
 
 def get_target_data():
-    df_pred = pd.read_excel('targets_clean_test.xlsx')
-    print(df_pred)
-    print(df_pred.columns)
+    df_pred = pd.read_excel('DealMatch/targets_clean_test.xlsx')
     return df_pred
 
 def get_model_target():
