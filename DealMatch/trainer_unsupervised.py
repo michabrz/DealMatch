@@ -104,7 +104,7 @@ class Trainer():
 
         self.pipeline_investors = Pipeline([
                             ('preproc',preprocessor),
-                            ('dense', DenseTransformer())
+                            ('dense', DenseTransformer()),
                             ('pca',PCA(n_components=0.95))
         ])
 
@@ -146,6 +146,8 @@ if __name__ == "__main__":
     trainer.preproc_targets_pipe()
     trainer.nn_trainer()
     trainer.clean_target_data()
+    trainer.set_pipeline_investors()
+    trainer.nn_investors()
     trainer.run_investors()
     trainer.save_model_targets()
     trainer.save_model_investors()

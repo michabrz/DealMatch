@@ -55,7 +55,7 @@ def make_prediction_targets():
 
 def matching_investors(df_companies):
 
-    matching_table = pd.read_excel('../raw_data/matching_table_raw.xlsx')
+    matching_table = pd.read_csv('matching_table.csv')
 
     matching_investors = []
     matching_target = []
@@ -106,20 +106,23 @@ def make_prediction_investors(df_match_investors, best_investors):
         distance_investor_investor.append(0)
         distance_target_target.append(df_match_investors[df_match_investors['investors']==investor]['distance'].min())
 
+    
 
     for investor in best_investors:
         if investors_clean['name'].str.contains(investor).any():
             first_distance = df_match_investors[df_match_investors['investors']==investor]['distance'].min()
             to_pred = investors_clean[investors_clean['name']==investor]
-        pipeline = get_model_investors()
-        nearest_investors = pipeline.kneighbors(investor,4)
+            
+            preproc_investors = get_investors_preproc()
+            to_pred_transformed = preproc_investors.transform(to_pred)
+            investors_pipe = get_model_investors()
+            nearest_investors = investors_pipe.kneighbors(to_pred_transformed,4)
 
-
-        for x,y in zip(nearest_investors[1][0],nearest_investors[0][0]):
-            name_investor.append(investors_clean['name'].iloc[x])
-            description_investor.append(investors_clean['name_de'].iloc[x])
-            distance_investor_investor.append(y)
-            distance_target_target.append(first_distance)
+            for x,y in zip(nearest_investors[1][0],nearest_investors[0][0]):
+                name_investor.append(investors_clean['name'].iloc[x])
+                description_investor.append(investors_clean['name_de'].iloc[x])
+                distance_investor_investor.append(y)
+                distance_target_target.append(first_distance)
 
     df_investors = pd.DataFrame({'name':name_investor,
                 'description':description_investor,
