@@ -2,28 +2,38 @@ import joblib
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 
-MODEL_TARGETS = 'model_targets.joblib'
-MODEL_INVESTORS = 'model_investors.joblib'
+MODEL_TARGETS = 'nn.pkl'
+MODEL_PREPROC = 'pipeline.pkl'
+MODEL_INVESTORS = 'nn_investors.pkl'
+MODEL_PREPROC_INVESTORS = 'pipeline_investors.pkl'
 
 def get_target_data():
     df_pred = pd.read_excel('targets_clean_test.xlsx')
-    print(df_pred)
-    print(df_pred.columns)
     return df_pred
 
 def get_model_target():
     pipe_targets = joblib.load(MODEL_TARGETS)
     return pipe_targets
 
+def get_model_preproc():
+    pipe_preproc = joblib.load(MODEL_PREPROC)
+    return pipe_preproc
+
 def get_model_investors():
     pipe_investors = joblib.load(MODEL_INVESTORS)
     return pipe_investors
 
+def get_investors_preproc():
+    preproc_investors = joblib.load(MODEL_PREPROC_INVESTORS)
+    return preproc_investors
+
 def make_prediction_targets():
     df = get_target_data()
-    pipeline = get_model_target()
-    print(pipeline.named_steps['preproc'].transform([df]))
-    nearest_targets = pipeline['NN'].kneighbors(df,10)
+    preproc = get_model_preproc()
+    df_transformed = preproc.transform(df)
+    targets_pipe = get_model_target()
+    nearest_targets = targets_pipe.kneighbors(df_transformed)
+    print(nearest_targets)
 
     targets = pd.read_csv('targets.csv')
 
@@ -45,7 +55,7 @@ def make_prediction_targets():
 
 def matching_investors(df_companies):
 
-    matching_table = pd.read_excel('matching_table_raw.xlsx')
+    matching_table = pd.read_excel('../raw_data/matching_table_raw.xlsx')
 
     matching_investors = []
     matching_target = []
@@ -78,6 +88,13 @@ def make_prediction_investors(df_match_investors, best_investors):
     description_investor = []
     distance_investor_investor = []
     distance_target_target = []
+
+    # df = get_target_data()
+    # preproc = get_model_preproc()
+    # df_transformed = preproc.transform(df)
+    # targets_pipe = get_model_target()
+    # nearest_targets = targets_pipe.kneighbors(df_transformed)
+    # print(nearest_targets)
 
 
     for investor in best_investors:
