@@ -3,22 +3,24 @@ import numpy as np
 import string
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+import os
+
 
 def get_targets_data():
 
-    targets = pd.read_excel('../raw_data/targets_raw.xlsx', index_col=0)
+    targets = pd.read_excel('../../raw_data/targets_raw.xlsx', index_col=0)
 
     return targets
 
 def get_investors_data():
 
-    investors = pd.read_excel('../raw_data/invest_profile_keywords.xlsx')
+    investors = pd.read_excel('../../raw_data/invest_profile_keywords.xlsx')
 
     return investors
 
 def get_matching_keys():
 
-    key_match = pd.read_excel('../raw_data/new_keywords.xlsx')
+    key_match = pd.read_excel('../../raw_data/new_keywords.xlsx')
 
     key_match.to_csv('matching_keys.csv')
 
@@ -26,7 +28,7 @@ def get_matching_keys():
 
 def get_matching_table():
 
-    matching_table = pd.read_excel('../raw_data/matching_table.xlsx')
+    matching_table = pd.read_excel('../../raw_data/matching_table.xlsx')
 
     matching_table.to_csv('matching_table.csv')
 
@@ -95,3 +97,4 @@ def clean_investors(investors,key_match):
     investors_concat1.to_csv('investors.csv')
 
     return investors_concat1
+
