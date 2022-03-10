@@ -28,16 +28,13 @@ s3fs
 six>=1.14
 joblib
 memoized-property
-<<<<<<< HEAD
 
 #extra
 nltk
 python-dotenv
 openpyxl
-=======
 os
 
 # database
 sqlalchemy
 dotenv
->>>>>>> 8d3c1827eceb4036f215aef630cf9042931ba28e
