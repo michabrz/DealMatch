@@ -12,7 +12,7 @@ from sklearn.compose import make_column_selector
 import joblib
 from sklearn.base import TransformerMixin
 from DealMatch.custom_transformer import DenseTransformer
-from DealMatch.data_unsupervised import get_targets_data, get_investors_data, get_matching_keys, clean_targets, clean_investors
+from DealMatch.data_unsupervised import get_targets_data, get_investors_data, get_matching_keys, clean_targets, clean_investors, get_matching_table
 
 class Trainer():
 
@@ -91,55 +91,57 @@ class Trainer():
         self.pipeline_targets.fit_transform(self.X)
     # self.pipeline_targets.transform(self.X)
 
-    def save_model_targets(self):
+    # def save_model_targets(self):
 
-        joblib.dump(self.pipeline_targets,'model_targets.joblib')
+    #     joblib.dump(self.pipeline_targets,'model_targets.joblib')
 
 
     def set_pipeline_investors(self):
+        tfidf_features = 'name_de'
+        tfidf_pipe = Pipeline([('tfidf', TfidfVectorizer()), ('dense', DenseTransformer())])
 
         preprocessor = ColumnTransformer([
-                ('tfidf',TfidfVectorizer(),['name_de'])
+                ('name_de',tfidf_pipe,tfidf_features)
         ], remainder='drop')
 
         self.pipeline_investors = Pipeline([
                             ('preproc',preprocessor),
-                            ('dense', DenseTransformer()),
-                            ('pca',PCA(n_components=0.95))
+                            ('pca',PCA(0.95))
         ])
+        
 
         self.pipeline_investors.fit(self.Y)
 
         joblib.dump(self.pipeline_investors, 'pipeline_investors.pkl')
 
     def nn_investors(self):
-
         Y_transformed = self.pipeline_investors.transform(self.Y)
         nn_investors = NearestNeighbors(n_neighbors=10).fit(Y_transformed)
         joblib.dump(nn_investors, 'nn_investors.pkl')
 
 
-    def run_investors(self):
+    # def run_investors(self):
 
-        self.set_pipeline_investors()
-        self.pipeline_investors.fit(self.Y)
+    #     self.set_pipeline_investors()
+    #     self.pipeline_investors.fit(self.Y)
 
 
-    def save_model_investors(self):
+    # def save_model_investors(self):
 
-        joblib.dump(self.pipeline_investors,'model_investors.joblib')
+    #     joblib.dump(self.pipeline_investors,'model_investors.joblib')
 
 
 
 if __name__ == "__main__":
 
-    # df_targets = get_targets_data()
-    # df_investors = get_investors_data()
-    # df_investor_keys = get_matching_keys()
-    # df_targets_clean = clean_targets(df_targets)
-    # df_investors_clean = clean_investors(df_investors,df_investor_keys)
+    df_targets = get_targets_data()
+    df_investors = get_investors_data()
+    df_investor_keys = get_matching_keys()
+    df_targets_clean = clean_targets(df_targets)
+    df_investors_clean = clean_investors(df_investors,df_investor_keys)
     df_targets_clean = pd.read_csv('targets.csv', index_col=0)
     df_investors_clean = pd.read_csv('investors.csv', index_col=0)
+    get_matching_table()
     X = df_targets_clean
     Y = df_investors_clean
     trainer = Trainer(X,Y)
@@ -148,6 +150,6 @@ if __name__ == "__main__":
     trainer.clean_target_data()
     trainer.set_pipeline_investors()
     trainer.nn_investors()
-    trainer.run_investors()
-    trainer.save_model_targets()
-    trainer.save_model_investors()
+    #trainer.run_investors()
+    #trainer.save_model_targets()
+    #trainer.save_model_investors()

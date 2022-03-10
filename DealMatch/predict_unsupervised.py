@@ -1,6 +1,7 @@
 import joblib
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
+from DealMatch.custom_transformer import DenseTransformer
 
 MODEL_TARGETS = 'nn.pkl'
 MODEL_PREPROC = 'pipeline.pkl'
@@ -35,7 +36,7 @@ def make_prediction_targets():
     nearest_targets = targets_pipe.kneighbors(df_transformed)
     print(nearest_targets)
 
-    targets = pd.read_csv('targets.csv')
+    targets = pd.read_csv('../targets.csv')
 
     name = []
     description = []
@@ -82,13 +83,17 @@ def best_investors(df_match_investors):
 
 def make_prediction_investors(df_match_investors, best_investors):
 
-    investors_clean = pd.read_csv('investors.csv')
+    investors_clean = pd.read_csv('../investors.csv')
+
 
     name_investor = []
     description_investor = []
     distance_investor_investor = []
     distance_target_target = []
-
+    
+    preproc_investors = get_investors_preproc()
+    investors_pipe = get_model_investors()
+        
     # df = get_target_data()
     # preproc = get_model_preproc()
     # df_transformed = preproc.transform(df)
@@ -111,11 +116,12 @@ def make_prediction_investors(df_match_investors, best_investors):
     for investor in best_investors:
         if investors_clean['name'].str.contains(investor).any():
             first_distance = df_match_investors[df_match_investors['investors']==investor]['distance'].min()
-            to_pred = investors_clean[investors_clean['name']==investor]
+            to_pred = investors_clean[investors_clean['name']==investor].drop(columns=['Unnamed: 0'])
             
-            preproc_investors = get_investors_preproc()
+            #preproc_investors = get_investors_preproc()
+            #print(preproc_investors)
             to_pred_transformed = preproc_investors.transform(to_pred)
-            investors_pipe = get_model_investors()
+            #investors_pipe = get_model_investors()
             nearest_investors = investors_pipe.kneighbors(to_pred_transformed,4)
 
             for x,y in zip(nearest_investors[1][0],nearest_investors[0][0]):
