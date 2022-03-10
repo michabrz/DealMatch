@@ -28,7 +28,7 @@ def get_matching_table():
 
     matching_table = pd.read_excel('../raw_data/matching_table.xlsx')
 
-    matching_table.to_csv('matching_table')
+    matching_table.to_csv('matching_table.csv')
 
     return matching_table
 
