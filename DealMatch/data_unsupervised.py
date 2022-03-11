@@ -8,19 +8,19 @@ import os
 
 def get_targets_data():
 
-    targets = pd.read_excel('../../raw_data/targets_raw.xlsx', index_col=0)
+    targets = pd.read_excel('../raw_data/targets_raw.xlsx', index_col=0)
 
     return targets
 
 def get_investors_data():
 
-    investors = pd.read_excel('../../raw_data/invest_profile_keywords.xlsx')
+    investors = pd.read_excel('../raw_data/invest_profile_keywords.xlsx')
 
     return investors
 
 def get_matching_keys():
 
-    key_match = pd.read_excel('../../raw_data/new_keywords.xlsx')
+    key_match = pd.read_excel('../raw_data/new_keywords.xlsx')
 
     key_match.to_csv('matching_keys.csv')
 
@@ -28,7 +28,7 @@ def get_matching_keys():
 
 def get_matching_table():
 
-    matching_table = pd.read_excel('../../raw_data/matching_table.xlsx')
+    matching_table = pd.read_excel('../raw_data/matching_table_final_final.xlsx')
 
     matching_table.to_csv('matching_table.csv')
 
@@ -98,3 +98,15 @@ def clean_investors(investors,key_match):
 
     return investors_concat1
 
+def get_investors_profiles():
+    matching_table = get_matching_table()
+    investor_profiles = pd.read_excel("../raw_data/df_final_investors_preprocessed.xlsx", index_col=0)
+    investor_profiles.drop_duplicates(inplace=True)
+    investor_profiles = pd.merge(investor_profiles, matching_table[['investor_id', 'investor_name']], on="investor_id")
+    investor_profiles.drop_duplicates(inplace=True)
+    cols = investor_profiles.columns.to_list()
+    cols = cols[-1:] + cols[:-1]
+    investor_profiles = investor_profiles[cols]
+    investor_profiles.rename(columns={'investor_name':'name'}, inplace=True)
+    investor_profiles.to_csv('investor_profiles_to_merge.csv')
+    return investor_profiles

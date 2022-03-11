@@ -1,36 +1,45 @@
 import pandas as pd
 import numpy as np
-from DealMatch.predict_unsupervised import matching_investors, best_investors, make_prediction_investors
 import joblib
+from sklearn.impute import SimpleImputer
 
-MODEL_SUPERVISED = '../models/model_supervised_MLP1.joblib'
-MODEL_TARGETS_CLEANING = '../models/model_target_cleaner_for_matching.joblib'
+MODEL_SUPERVISED = 'model_supervised_MLP1.joblib'
+MODEL_TARGETS_CLEANING = 'model_target_cleaner_for_matching.joblib'
+
+def get_input_data():
+    input_data = pd.read_excel('targets_clean_test.xlsx')
+    return input_data
 
 def get_model_targets_cleaning():
     pipe_targets_cleaner = joblib.load(MODEL_TARGETS_CLEANING)
     return pipe_targets_cleaner
 
-def get_matching_table():
-    matching_investors = pd.read_excel('../raw_data/matching_table_raw.xlsx')
-    return matching_investors
-
 def get_model_supervised():
     pipe_supervised = joblib.load(MODEL_SUPERVISED)
     return pipe_supervised
 
+def transform_investors():
+    df_investors = pd.read_csv('investors_output.csv', index_col=0)
+    investor_profiles = pd.read_csv('investor_profiles_to_merge.csv', index_col=0)
+    df_investors_supervised = pd.merge(df_investors['name'], investor_profiles, on="name")
+    df_investors_supervised.drop_duplicates(inplace=True)
+    return df_investors_supervised
+     
 def transform_targets():
-    pipeline = get_model_targets_cleaning()
-    input_data = pd.read_csv('input.csv') # how will we read in the input data that should be transformed using the pre-trained targets-preproc-pipeline?
-    input_data_transformed = pipeline.transform(input_data)
+    pipe_targets_cleaner = get_model_targets_cleaning()
+    input_data = get_input_data()
+    input_data_transformed = pipe_targets_cleaner.transform(input_data)
+    SimpleImputer.get_feature_names_out = (lambda self, names=None: self.feature_names_in_)
+    input_data_transformed = pd.DataFrame(input_data_transformed,
+             columns=pipe_targets_cleaner.get_feature_names_out())
     return input_data_transformed
 
 def get_pred_table():
-    df_investors_sorted = make_prediction_investors()
-    df_investors = get_matching_table()
+    
+    df_investors = transform_investors()
     df_target = transform_targets()
-    df_investors_to_match_target = pd.merge(df_investors_sorted, df_investors, on="investor_id", how="left")
-    df_target = df_target[df_target.columns.drop(list(df_target.filter(regex='remainder')))]
-    pred_df = pd.concat([df_target, df_investors_to_match_target], axis=1)
+    pred_df = pd.concat([df_target,df_investors],axis=1).ffill().sum(level=0, axis=1)
+    pred_df.drop(columns=['name','investor_id'],inplace=True)
     return pred_df
 
 def custom_predict(X, custom_threshold):
@@ -47,8 +56,4 @@ if __name__ == "__main__":
     X = get_pred_table()
     updated_preds = custom_predict(X=X,
                                    custom_threshold=0.1273888936253839)
-
-    # match_investors = matching_investors(pred_df)
-    # match_investors_list = best_investors(match_investors)
-    # final_investors = make_prediction_investors(match_investors,
-    #                                             match_investors_list)
+    print(updated_preds)
