@@ -36,7 +36,7 @@ def make_prediction_targets():
     nearest_targets = targets_pipe.kneighbors(df_transformed)
     print(nearest_targets)
 
-    targets = pd.read_csv('../targets.csv')
+    targets = pd.read_csv('targets.csv')
 
     name = []
     description = []
@@ -63,7 +63,7 @@ def matching_investors(df_companies):
     matching_distance = []
 
     for company in df_companies['name']:
-        next_investor = matching_table[(matching_table['target_name']==company) & (matching_table['deal_stage_id']>=3)]['comp_name'].tolist()
+        next_investor = matching_table[(matching_table['target_name']==company) & (matching_table['deal_stage_id']>=3)]['investor_name'].tolist()
         matching_investors+=next_investor
         matching_target+=len(next_investor)*[company]
         next_distance = df_companies[df_companies['name']==company]['distance'].tolist()
@@ -83,7 +83,7 @@ def best_investors(df_match_investors):
 
 def make_prediction_investors(df_match_investors, best_investors):
 
-    investors_clean = pd.read_csv('../investors.csv')
+    investors_clean = pd.read_csv('investors.csv')
 
 
     name_investor = []
@@ -137,6 +137,7 @@ def make_prediction_investors(df_match_investors, best_investors):
                     'distance_target<=>investor': [a+b for a,b in zip(distance_investor_investor,distance_target_target)]})
 
     df_investors_sorted = df_investors.sort_values('distance_target<=>investor')
+    df_investors_sorted.drop_duplicates(inplace=True)
     df_investors_sorted.reset_index(inplace=True)
     df_investors_sorted.drop('index',axis=1,inplace=True)
 

@@ -12,7 +12,7 @@ from sklearn.compose import make_column_selector
 import joblib
 from sklearn.base import TransformerMixin
 from DealMatch.custom_transformer import DenseTransformer
-from DealMatch.data_unsupervised import get_targets_data, get_investors_data, get_matching_keys, clean_targets, clean_investors, get_matching_table
+from DealMatch.data_unsupervised import get_targets_data, get_investors_data, get_matching_keys, clean_targets, clean_investors, get_investors_profiles
 
 class Trainer():
 
@@ -119,6 +119,7 @@ class Trainer():
         nn_investors = NearestNeighbors(n_neighbors=10).fit(Y_transformed)
         joblib.dump(nn_investors, 'nn_investors.pkl')
 
+  
 
     # def run_investors(self):
 
@@ -141,7 +142,7 @@ if __name__ == "__main__":
     df_investors_clean = clean_investors(df_investors,df_investor_keys)
     df_targets_clean = pd.read_csv('targets.csv', index_col=0)
     df_investors_clean = pd.read_csv('investors.csv', index_col=0)
-    get_matching_table()
+    get_investors_profiles()
     X = df_targets_clean
     Y = df_investors_clean
     trainer = Trainer(X,Y)
