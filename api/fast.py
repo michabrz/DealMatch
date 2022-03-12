@@ -21,25 +21,6 @@ def index():
     return {"greeting": "Welcome to the Deal Match recommender"}
 
 @app.get("/recommend")
-# def recommend(deal_id, deal_name, deal_type_name, target_company_id,
-#              target_name, target_description, target_revenue, target_ebitda,
-#              target_ebit, country_name, region_name, sector_name, strs):
-#     X = dict(
-#         deal_id=[int(deal_id)],
-#         deal_name=[str(deal_name)],
-#         deal_type_name=[str(deal_type_name)],
-#         target_company_id=[int(target_company_id)],
-#         target_name=[str(target_name)],
-#         target_description=[target_description],
-#         target_revenue=[int(target_revenue)],
-#         target_ebitda=[int(target_ebitda)],
-#         target_ebit=[int(target_ebit)],
-#         country_name=[str(country_name)],
-#         region_name=[str(region_name)],
-#         sector_name=[str(sector_name)],
-#         strs=[str(strs)])
-
-#     return X
 def recommend(deal_id, deal_name, deal_type_name, target_company_id,
               target_name, target_description, target_revenue, target_ebitda,
               target_ebit, country_name, region_name, sector_name, strs):
@@ -64,12 +45,6 @@ def recommend(deal_id, deal_name, deal_type_name, target_company_id,
    X_transformed = preproc.transform(X)
    targets_pipe = joblib.load(MODEL_TARGETS)
    nearest_targets = targets_pipe.kneighbors(X_transformed)
-#    res = list(nearest_targets)
-#    print(dict(res=list(nearest_targets[0])))
-
-#    pipeline = joblib.load('./model_targets.joblib')
-
-#    pred = pipeline.kneighbors(X)
 
    name = []
    description = []
@@ -85,5 +60,3 @@ def recommend(deal_id, deal_name, deal_type_name, target_company_id,
    df_companies = {'name': name,'description': description,'distance': distance}
 
    return df_companies
-
-#    return dict(res=list(nearest_targets[0]))

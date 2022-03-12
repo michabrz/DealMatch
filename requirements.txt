@@ -19,7 +19,7 @@ cloudpickle==2.0.0
 colorama==0.4.4
 coverage==6.3.2
 databricks-cli==0.16.4
--e git+git@github.com:michabrz/DealMatch.git@27809f37217db5322f953b70f8667647419a9bc8#egg=DealMatch
+# -e git+git@github.com:michabrz/DealMatch.git@27809f37217db5322f953b70f8667647419a9bc8#egg=DealMatch
 debugpy==1.5.1
 decorator==5.1.1
 docker==5.0.3
