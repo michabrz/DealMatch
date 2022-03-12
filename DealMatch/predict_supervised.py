@@ -39,17 +39,34 @@ def get_pred_table():
     df_investors = transform_investors()
     df_target = transform_targets()
     pred_df = pd.concat([df_target,df_investors],axis=1).ffill().sum(level=0, axis=1)
+    pred_df.to_csv('pred_df_names.csv')
     pred_df.drop(columns=['name','investor_id'],inplace=True)
+    pred_df.to_csv('pred_df')
     return pred_df
 
 def custom_predict(X, custom_threshold):
+    df_final = pd.read_csv('pred_df_names.csv', index_col=0)
+    df_investors = pd.read_csv('investors_output.csv', index_col=0)
+    df_investors = df_investors.drop_duplicates(subset='name', keep="first")
     model = get_model_supervised()
     probs = model.predict_proba(
             X)  # Get likelihood of each sample being classified as 0 or 1
     expensive_probs = probs[:, 1]  # Only keep expensive likelihoods (1)
-    return (expensive_probs > custom_threshold).astype(
-        int)  # Boolean outcome converted to 0 or 1
-
+    class_list = (expensive_probs > custom_threshold).astype(int)
+    df_final['investor_classification'] = class_list
+    df_final = df_final[['name','investor_classification']]
+    missing_investors = []
+    for name in df_investors['name']:
+        if ~df_final['name'].str.contains(name).any():
+            missing_investors.append(name)
+    df_mi = pd.DataFrame({'name':missing_investors,'investor_classification':len(missing_investors)*['Manual Review Required']})
+    df_final = pd.concat([df_final,df_mi])
+    df_final.reset_index(inplace=True)
+    df_final.drop(columns='index',inplace=True)
+    df_final = df_final.merge(df_investors,on='name',how='left').drop(columns=['distance_investor<=>investor','distance_target<=>target'])
+    df_final['Rationale'] = 'Fit gem. DealCircle Datenbank'
+    df_final.to_csv('final_prediction.csv',encoding='utf-8-sig')
+    return df_final
 
 
 if __name__ == "__main__":
