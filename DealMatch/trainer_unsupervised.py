@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.decomposition import TruncatedSVD
@@ -34,17 +34,18 @@ class Trainer():
                                      SimpleImputer(missing_values=np.nan,
                                                    strategy='constant',
                                                    fill_value=0)),
-                                    ('scaler', RobustScaler())])
+                                    ('scaler', MinMaxScaler())])
 
-        preproc = ColumnTransformer(transformers=[
+
+        preproc = ColumnTransformer([
             ('num_tr', num_transformer,
-             ['target_ebit', 'target_ebitda', 'target_revenue']),
+             ['target_revenue', 'target_ebitda','target_ebit']),
                   ('tfidf', tfidf_transformer, tfidf_features)
         ],
                                     remainder='drop')
 
+        
         self.pipeline_targets = Pipeline([('preproc', preproc), ('pca', PCA(0.95))])
-
         self.pipeline_targets.fit(self.X)
 
         joblib.dump(self.pipeline_targets, 'pipeline.pkl')
@@ -81,6 +82,7 @@ class Trainer():
     def nn_trainer(self):
 
         X_transformed = self.pipeline_targets.transform(self.X)
+        print(X_transformed.shape)
         nn = NearestNeighbors(n_neighbors=10).fit(X_transformed)
         joblib.dump(nn, 'nn.pkl')
 
@@ -116,6 +118,7 @@ class Trainer():
 
     def nn_investors(self):
         Y_transformed = self.pipeline_investors.transform(self.Y)
+        print(f'Investors transformed {Y_transformed.shape}')
         nn_investors = NearestNeighbors(n_neighbors=10).fit(Y_transformed)
         joblib.dump(nn_investors, 'nn_investors.pkl')
 
@@ -140,8 +143,8 @@ if __name__ == "__main__":
     df_investor_keys = get_matching_keys()
     df_targets_clean = clean_targets(df_targets)
     df_investors_clean = clean_investors(df_investors,df_investor_keys)
-    df_targets_clean = pd.read_csv('targets.csv', index_col=0)
-    df_investors_clean = pd.read_csv('investors.csv', index_col=0)
+    #df_targets_clean = pd.read_csv('targets.csv', index_col=0)
+    #df_investors_clean = pd.read_csv('investors.csv', index_col=0)
     get_investors_profiles()
     X = df_targets_clean
     Y = df_investors_clean

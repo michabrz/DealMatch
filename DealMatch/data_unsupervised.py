@@ -79,6 +79,7 @@ def clean_investors(investors,key_match):
 
     investors['name_de'] = investors['name_de'].replace(dict(zip(key_match.name_de,key_match.new_keyword)))
     investors_small = investors[['name','name_de']]
+    investors_small.drop_duplicates(inplace=True)
     investors_concat = investors_small.astype(str).groupby('name').agg({'name_de':', '.join})
 
     investors_concat1 = investors_concat['name_de'].str.replace('nan','').reset_index()
