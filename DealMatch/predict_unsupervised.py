@@ -2,6 +2,10 @@ import joblib
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 from DealMatch.custom_transformer import DenseTransformer
+from DealMatch.data_unsupervised import remove_punctuations
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 MODEL_TARGETS = 'nn.pkl'
 MODEL_PREPROC = 'pipeline.pkl'
@@ -31,6 +35,22 @@ def get_investors_preproc():
 def make_prediction_targets():
     df = get_target_data()
     preproc = get_model_preproc()
+    
+    nltk.download('stopwords')
+    
+    df['strs'] = df['strs'].str.replace(',',' ')
+    df['strs'] = df['strs'].apply(lambda x: remove_punctuations(x))
+    df['strs'] = df['strs'].apply(lambda x: x.lower())
+    
+    
+    stop_words = set(stopwords.words('german'))
+
+    for name_de in df['strs']:
+        word_tokens = word_tokenize(name_de)
+        name_de = [w for w in word_tokens if not w in stop_words]
+        
+    df.to_csv('input_data.csv')
+    
     df_transformed = preproc.transform(df)
     targets_pipe = get_model_target()
     nearest_targets = targets_pipe.kneighbors(df_transformed)

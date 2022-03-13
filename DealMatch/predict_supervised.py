@@ -7,7 +7,8 @@ MODEL_SUPERVISED = 'model_supervised_MLP1.joblib'
 MODEL_TARGETS_CLEANING = 'model_target_cleaner_for_matching.joblib'
 
 def get_input_data():
-    input_data = pd.read_excel('targets_clean_test.xlsx')
+    #input_data = pd.read_excel('targets_clean_test.xlsx')
+    input_data = pd.read_csv('input_data.csv', index_col=0)
     return input_data
 
 def get_model_targets_cleaning():
