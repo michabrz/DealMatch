@@ -45,16 +45,11 @@ class Trainer():
     def run_target_cleaner_for_matching(self):
 
         self.clean_targets_pipeline()
-        joblib.dump(self.pipeline_targets, 'pipeline_targets.pkl')
         self.pipeline_targets.fit(self.data)
-
-    def save_model_clean_targets_for_matching(self):
-
         joblib.dump(self.pipeline_targets, 'model_target_cleaner_for_matching.joblib')
-
+        
 
 if __name__ == "__main__":
     df_targets = get_targets_clean_data()
     trainer = Trainer(df_targets)
     trainer.run_target_cleaner_for_matching()
-    trainer.save_model_clean_targets_for_matching()

@@ -1,7 +1,6 @@
 import joblib
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
-from DealMatch.custom_transformer import DenseTransformer
 from DealMatch.data_unsupervised import remove_punctuations
 import nltk
 from nltk.corpus import stopwords
@@ -114,13 +113,6 @@ def make_prediction_investors(df_match_investors, best_investors):
     preproc_investors = get_investors_preproc()
     investors_pipe = get_model_investors()
         
-    # df = get_target_data()
-    # preproc = get_model_preproc()
-    # df_transformed = preproc.transform(df)
-    # targets_pipe = get_model_target()
-    # nearest_targets = targets_pipe.kneighbors(df_transformed)
-    # print(nearest_targets)
-
 
     for investor in best_investors:
         name_investor.append(investor)
@@ -138,10 +130,7 @@ def make_prediction_investors(df_match_investors, best_investors):
             first_distance = df_match_investors[df_match_investors['investors']==investor]['distance'].min()
             to_pred = investors_clean[investors_clean['name']==investor].drop(columns=['Unnamed: 0'])
             
-            #preproc_investors = get_investors_preproc()
-            #print(preproc_investors)
             to_pred_transformed = preproc_investors.transform(to_pred)
-            #investors_pipe = get_model_investors()
             nearest_investors = investors_pipe.kneighbors(to_pred_transformed,4)
 
             for x,y in zip(nearest_investors[1][0],nearest_investors[0][0]):
