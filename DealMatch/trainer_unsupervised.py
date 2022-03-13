@@ -51,34 +51,6 @@ class Trainer():
         joblib.dump(self.pipeline_targets, 'pipeline.pkl')
 
 
-    def clean_target_data(self):
-
-        num_transformer = Pipeline([('imputer',
-                                     SimpleImputer(missing_values=np.nan,
-                                                   strategy='constant',
-                                                   fill_value=0)),
-                                    ('scaler', RobustScaler())])
-
-        cat_transformer = Pipeline([('imputer',
-                                     SimpleImputer(missing_values=np.nan,
-                                                   strategy='constant',
-                                                   fill_value='no_region'))])
-
-        preprocessor = ColumnTransformer([
-            ('num_tr', num_transformer,
-             ['target_ebit', 'target_ebitda', 'target_revenue']),
-            ('cat_tr', cat_transformer,
-             ['deal_type_name', 'country_name', 'region_name', 'sector_name'])
-        ],
-                                         remainder='passthrough')
-
-        self.pipeline_data = Pipeline([('preproc', preprocessor)])
-
-        self.pipeline_data.fit(self.X)
-
-        joblib.dump(self.pipeline_data, 'preproc_input_target.pkl')
-
-
     def nn_trainer(self):
 
         X_transformed = self.pipeline_targets.transform(self.X)
@@ -91,12 +63,6 @@ class Trainer():
 
         self.preproc_pca_pipe()
         self.pipeline_targets.fit_transform(self.X)
-    # self.pipeline_targets.transform(self.X)
-
-    # def save_model_targets(self):
-
-    #     joblib.dump(self.pipeline_targets,'model_targets.joblib')
-
 
     def set_pipeline_investors(self):
         tfidf_features = 'name_de'
@@ -122,19 +88,6 @@ class Trainer():
         nn_investors = NearestNeighbors(n_neighbors=10).fit(Y_transformed)
         joblib.dump(nn_investors, 'nn_investors.pkl')
 
-  
-
-    # def run_investors(self):
-
-    #     self.set_pipeline_investors()
-    #     self.pipeline_investors.fit(self.Y)
-
-
-    # def save_model_investors(self):
-
-    #     joblib.dump(self.pipeline_investors,'model_investors.joblib')
-
-
 
 if __name__ == "__main__":
 
@@ -151,7 +104,6 @@ if __name__ == "__main__":
     trainer = Trainer(X,Y)
     trainer.preproc_targets_pipe()
     trainer.nn_trainer()
-    trainer.clean_target_data()
     trainer.set_pipeline_investors()
     trainer.nn_investors()
     #trainer.run_investors()
