@@ -5,6 +5,8 @@ import joblib
 import pandas as pd
 from DealMatch.predict_unsupervised import *
 from DealMatch.predict_supervised import *
+import nltk
+nltk.download('punkt')
 
 MODEL_PREPROC_1 = './DealMatch/pipeline.pkl'
 MODEL_TARGETS_1 = './DealMatch/nn.pkl'
