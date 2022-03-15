@@ -11,8 +11,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.compose import make_column_selector
 import joblib
 from sklearn.base import TransformerMixin
-from DealMatch.custom_transformer import DenseTransformer
-from DealMatch.data_unsupervised import get_targets_data, get_investors_data, get_matching_keys, clean_targets, clean_investors, get_investors_profiles
+from DealMatch.data.custom_transformer import DenseTransformer
+from DealMatch.data.data_unsupervised import get_targets_data, get_investors_data, get_matching_keys, clean_targets, clean_investors, get_investors_profiles
 
 class Trainer():
 
@@ -44,7 +44,7 @@ class Trainer():
         ],
                                     remainder='drop')
 
-        
+
         self.pipeline_targets = Pipeline([('preproc', preproc), ('pca', PCA(0.95))])
         self.pipeline_targets.fit(self.X)
 
@@ -76,7 +76,7 @@ class Trainer():
                             ('preproc',preprocessor),
                             ('pca',PCA(0.95))
         ])
-        
+
 
         self.pipeline_investors.fit(self.Y)
 
