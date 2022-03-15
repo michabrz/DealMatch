@@ -2,9 +2,10 @@ import pandas as pd
 import numpy as np
 import joblib
 from sklearn.impute import SimpleImputer
+from DealMatch.predict_unsupervised import make_prediction_investors
 
-MODEL_SUPERVISED = 'model_supervised_MLP1.joblib'
-MODEL_TARGETS_CLEANING = 'model_target_cleaner_for_matching.joblib'
+MODEL_SUPERVISED = './DealMatch/model_supervised_MLP1.joblib'
+MODEL_TARGETS_CLEANING = './DealMatch/model_target_cleaner_for_matching.joblib'
 
 def get_input_data():
     #input_data = pd.read_excel('targets_clean_test.xlsx')
@@ -20,12 +21,12 @@ def get_model_supervised():
     return pipe_supervised
 
 def transform_investors():
-    df_investors = pd.read_csv('investors_output.csv', index_col=0)
-    investor_profiles = pd.read_csv('investor_profiles_to_merge.csv', index_col=0)
+    df_investors = pd.read_csv('./DealMatch/investors_output.csv', index_col=0)
+    investor_profiles = pd.read_csv('./DealMatch/investor_profiles_to_merge.csv', index_col=0)
     df_investors_supervised = pd.merge(df_investors['name'], investor_profiles, on="name")
     df_investors_supervised.drop_duplicates(inplace=True)
     return df_investors_supervised
-     
+
 def transform_targets():
     pipe_targets_cleaner = get_model_targets_cleaning()
     input_data = get_input_data()
@@ -36,7 +37,7 @@ def transform_targets():
     return input_data_transformed
 
 def get_pred_table():
-    
+
     df_investors = transform_investors()
     df_target = transform_targets()
     pred_df = pd.concat([df_target,df_investors],axis=1).ffill().sum(level=0, axis=1)

@@ -1,15 +1,15 @@
 import joblib
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
-from DealMatch.data_unsupervised import remove_punctuations
+from DealMatch.data.data_unsupervised import remove_punctuations
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-MODEL_TARGETS = 'nn.pkl'
-MODEL_PREPROC = 'pipeline.pkl'
-MODEL_INVESTORS = 'nn_investors.pkl'
-MODEL_PREPROC_INVESTORS = 'pipeline_investors.pkl'
+MODEL_TARGETS = './DealMatch/nn.pkl'
+MODEL_PREPROC = './DealMatch/pipeline.pkl'
+MODEL_INVESTORS = './DealMatch/nn_investors.pkl'
+MODEL_PREPROC_INVESTORS = './DealMatch/pipeline_investors.pkl'
 
 def get_target_data():
     df_pred = pd.read_excel('targets_clean_test.xlsx')
@@ -27,35 +27,42 @@ def get_model_investors():
     pipe_investors = joblib.load(MODEL_INVESTORS)
     return pipe_investors
 
+def get_targets():
+    df = pd.read_csv('targets.csv')
+    return df
+
 def get_investors_preproc():
     preproc_investors = joblib.load(MODEL_PREPROC_INVESTORS)
     return preproc_investors
 
-def make_prediction_targets():
-    df = get_target_data()
-    preproc = get_model_preproc()
-    
+def make_prediction_targets(df, MODEL_PREPROC_1, MODEL_TARGETS_1, targets):
+    #df = get_target_data()
+    preproc = joblib.load(MODEL_PREPROC_1)
+    targets_pipe = joblib.load(MODEL_TARGETS_1)
+    # preproc = get_model_preproc()
+
     nltk.download('stopwords')
-    
+
     df['strs'] = df['strs'].str.replace(',',' ')
     df['strs'] = df['strs'].apply(lambda x: remove_punctuations(x))
     df['strs'] = df['strs'].apply(lambda x: x.lower())
-    
-    
+
+
     stop_words = set(stopwords.words('german'))
 
     for name_de in df['strs']:
         word_tokens = word_tokenize(name_de)
         name_de = [w for w in word_tokens if not w in stop_words]
-        
-    df.to_csv('input_data.csv')
-    
-    df_transformed = preproc.transform(df)
-    targets_pipe = get_model_target()
-    nearest_targets = targets_pipe.kneighbors(df_transformed)
-    print(nearest_targets)
 
-    targets = pd.read_csv('targets.csv')
+    df.to_csv('input_data.csv')
+
+    df_transformed = preproc.transform(df)
+    #targets_pipe = get_model_target()
+    nearest_targets = targets_pipe.kneighbors(df_transformed)
+    #print(nearest_targets)
+
+    #targets = pd.read_csv('targets.csv')
+    #targets = get_targets()
 
     name = []
     description = []
@@ -70,12 +77,13 @@ def make_prediction_targets():
     df_companies = pd.DataFrame({'name':name,
                 'description':description,
                 'distance':distance})
+    #print(df_companies)
 
     return df_companies
 
 def matching_investors(df_companies):
 
-    matching_table = pd.read_csv('matching_table.csv')
+    matching_table = pd.read_csv('./DealMatch/matching_table.csv')
 
     matching_investors = []
     matching_target = []
@@ -102,17 +110,17 @@ def best_investors(df_match_investors):
 
 def make_prediction_investors(df_match_investors, best_investors):
 
-    investors_clean = pd.read_csv('investors.csv')
+    investors_clean = pd.read_csv('./DealMatch/investors.csv')
 
 
     name_investor = []
     description_investor = []
     distance_investor_investor = []
     distance_target_target = []
-    
+
     preproc_investors = get_investors_preproc()
     investors_pipe = get_model_investors()
-        
+
 
     for investor in best_investors:
         name_investor.append(investor)
@@ -123,13 +131,13 @@ def make_prediction_investors(df_match_investors, best_investors):
         distance_investor_investor.append(0)
         distance_target_target.append(df_match_investors[df_match_investors['investors']==investor]['distance'].min())
 
-    
+
 
     for investor in best_investors:
         if investors_clean['name'].str.contains(investor).any():
             first_distance = df_match_investors[df_match_investors['investors']==investor]['distance'].min()
             to_pred = investors_clean[investors_clean['name']==investor].drop(columns=['Unnamed: 0'])
-            
+
             to_pred_transformed = preproc_investors.transform(to_pred)
             nearest_investors = investors_pipe.kneighbors(to_pred_transformed,4)
 

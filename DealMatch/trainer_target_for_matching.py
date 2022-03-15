@@ -41,13 +41,13 @@ class Trainer():
                                          remainder='drop')
 
         self.pipeline_targets = Pipeline([('preproc', preprocessor)])
-        
+
     def run_target_cleaner_for_matching(self):
 
         self.clean_targets_pipeline()
         self.pipeline_targets.fit(self.data)
         joblib.dump(self.pipeline_targets, 'model_target_cleaner_for_matching.joblib')
-        
+
 
 if __name__ == "__main__":
     df_targets = get_targets_clean_data()
