@@ -139,7 +139,7 @@ def make_prediction_investors(df_match_investors, best_investors):
             to_pred = investors_clean[investors_clean['name']==investor].drop(columns=['Unnamed: 0'])
 
             to_pred_transformed = preproc_investors.transform(to_pred)
-            nearest_investors = investors_pipe.kneighbors(to_pred_transformed,4)
+            nearest_investors = investors_pipe.kneighbors(to_pred_transformed,5)
 
             for x,y in zip(nearest_investors[1][0],nearest_investors[0][0]):
                 name_investor.append(investors_clean['name'].iloc[x])

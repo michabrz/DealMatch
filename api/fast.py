@@ -55,7 +55,7 @@ def recommend(deal_id, deal_name, deal_type_name, target_company_id,
     match_investors_list = best_investors(match_investors)
     final_investors = make_prediction_investors(match_investors, match_investors_list)
 
-    custom_threshold=0.1273888936253839
+    #custom_threshold=0.1273888936253839
 
     investor_profiles = pd.read_csv('./DealMatch/investor_profiles_to_merge.csv', index_col=0)
     df_final = pd.merge(final_investors['name'], investor_profiles, on="name")
@@ -73,9 +73,9 @@ def recommend(deal_id, deal_name, deal_type_name, target_company_id,
     df_final = df_final.drop_duplicates(subset='name', keep="first")
     model = joblib.load(MODEL_SUPERVISED)
     probs = model.predict_proba(pred_df)
-    expensive_probs = probs[:, 1]
-    class_list = (expensive_probs > custom_threshold).astype(int)
-    df_final['match_probability'] = class_list
+    #expensive_probs = probs[:, 1]
+    #class_list = (expensive_probs > custom_threshold).astype(int)
+    df_final['match_probability'] = np.round((probs[:, 1]*100), 2)
     df_final = df_final[['name','match_probability']]
     missing_investors = []
     for name in final_investors['name']:
