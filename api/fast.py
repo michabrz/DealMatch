@@ -81,12 +81,15 @@ def recommend(deal_id, deal_name, deal_type_name, target_company_id,
     for name in final_investors['name']:
         if ~df_final['name'].str.contains(name).any():
             missing_investors.append(name)
-    df_mi = pd.DataFrame({'name':missing_investors,'match_probability':len(missing_investors)*['Manual Review Required']})
+    df_mi = pd.DataFrame({'name':missing_investors,'match_probability':len(missing_investors)*0})
     df_final = pd.concat([df_final,df_mi])
+    df_final.sort_values(['match_probability'], inplace=True, ascending=False)
     df_final.reset_index(inplace=True)
     df_final.drop(columns='index',inplace=True)
     df_final = df_final.merge(final_investors,on='name',how='left').drop(columns=['distance_investor<=>investor','distance_target<=>target'])
     df_final['Rationale'] = 'Fit gem. DealCircle Datenbank'
+    df_final["match_probability"] = pd.to_numeric(df_final["match_probability"])
     df_final.drop_duplicates(subset="name",inplace=True)
+
 
     return df_final

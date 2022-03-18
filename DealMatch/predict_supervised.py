@@ -53,9 +53,8 @@ def custom_predict(X, custom_threshold):
     model = get_model_supervised()
     probs = model.predict_proba(
             X)  # Get likelihood of each sample being classified as 0 or 1
-    expensive_probs = probs[:, 1]  # Only keep expensive likelihoods (1)
-    class_list = (expensive_probs > custom_threshold).astype(int)
-    df_final['investor_classification'] = class_list
+    #expensive_probs = probs[:, 1]  # Only keep expensive likelihoods (1)
+    df_final['investor_classification'] = np.round((probs[:, 1]*100), 2)
     df_final = df_final[['name','investor_classification']]
     missing_investors = []
     for name in df_investors['name']:
